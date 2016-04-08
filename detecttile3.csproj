@@ -123,9 +123,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="pic3.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include=".vs\" />
     <Folder Include="x64\" />
   </ItemGroup>
