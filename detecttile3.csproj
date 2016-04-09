@@ -133,6 +133,11 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="tiles_logilink_gelb_5mm_14x8_v3.png" />
+    <Content Include="tiles_logilink_gelb_rot_5mm_14x8_v4.png" />
+    <Content Include="tiles_logilink_gelb_rot_5mm_14x8_v5.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
