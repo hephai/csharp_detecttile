@@ -277,6 +277,8 @@ namespace TileDetection
             return transfMat;
         }
 
+        string tileCenterLines = "X, Y";
+
         public void DetectFiducialPointsPerspectiveMat()
         {
             if (fileNameTextBox.Text != String.Empty)
@@ -312,21 +314,29 @@ namespace TileDetection
                 transfMat = detectFiducialPointsPerspectiveMat(in_image, transform_output, bgrFiltLower, bgrFiltUpper, widthTransfmmMal10, heightTransfmmMal10);
 
                 out_image2ImageBox.Image = transform_output;
+                List<RotatedRect> tileRrectsL = new List<RotatedRect>();
+                tileRrectsL = detectTilesCenter(transform_output);
 
-                detectTilesCenter(transform_output);
-
-
+                tileCenterLines = "X, Y, Angle" + Environment.NewLine ;
+                string tileCenterLine;
+                for (int i = 0; i < tileRrectsL.Count; i++)
+                {
+                    tileCenterLine = tileRrectsL[i].Center.X.ToString("0") + ", " + tileRrectsL[i].Center.Y.ToString("0") + ", " 
+                        + tileRrectsL[i].Angle.ToString("0.00") + Environment.NewLine;
+                    tileCenterLines += tileCenterLine;
+                }
+                
             }
         }
 
-        public List<Point> detectTilesCenter(Image<Bgr, Byte> plainMmMal10_image)
+        public List<RotatedRect> detectTilesCenter(Image<Bgr, Byte> plainMmMal10_image)
         {
-            List<Point> tileCenters = new List<Point>(); //return
+            List<RotatedRect> tileRrects = new List<RotatedRect>(); //return
 
             // die Fiducial sind 8x8mm mit Punkt in der Mitte // also bischen mehr als 8mm/2 nehmen -> 50
             Rectangle rectROI = new Rectangle(50, 50, plainMmMal10_image.Size.Width - 100, plainMmMal10_image.Size.Height - 100);
 
-            Image<Bgr, Byte> subPlainMmMal10 = plainMmMal10_image.GetSubRect(rectROI);
+            Image<Bgr, Byte> subPlainMmMal10 = plainMmMal10_image.GetSubRect(rectROI).Copy();
             Image<Gray, Byte> contour_output = new Image<Gray, byte>(subPlainMmMal10.Size);
             CvInvoke.CvtColor(subPlainMmMal10, contour_output, ColorConversion.Bgr2Gray);
             //CvInvoke.GaussianBlur(contour_output, contour_output, new Size(0, 0), 0);
@@ -361,6 +371,9 @@ namespace TileDetection
             {
                 CvInvoke.DrawContours(subPlainMmMal10, contours, iListFoundContours.ElementAt(i), new MCvScalar(0, 255, 255));
                 Cross2DF mitte = new Cross2DF(rrects[i].Center, 10, 10);
+                
+                tileRrects.Add(rrects[i]);
+
                 Point[] rr = { Point.Truncate(rrects[i].GetVertices()[0]), Point.Truncate(rrects[i].GetVertices()[1]), Point.Truncate(rrects[i].GetVertices()[2]), Point.Truncate(rrects[i].GetVertices()[3]) };
                 subPlainMmMal10.DrawPolyline(rr, true, new Bgr(0, 255, 255));
 
@@ -370,7 +383,7 @@ namespace TileDetection
             out_image4ImageBox.Image = subPlainMmMal10;
 
 
-            return tileCenters;
+            return tileRrects;
         }
 
         public void DetectTile()
@@ -383,6 +396,11 @@ namespace TileDetection
 
                 detectTilesCenter(in_image);
             }
+        }
+
+        public void saveTilePositions()
+        {
+
         }
 
         public void PerformShapeDetection()
@@ -552,6 +570,19 @@ namespace TileDetection
             }
         }
 
+        private void saveTilePositionsButton_Click(object sender, EventArgs e)
+        {
+            string suggestfileName = fileNameTextBox.Text;
+            saveFileDialog1.FileName = suggestfileName.Substring(0, suggestfileName.Length-3) + "txt";
+            DialogResult result = saveFileDialog1.ShowDialog();
+            if (result == DialogResult.OK || result == DialogResult.Yes)
+            {
+                string saveFileTilePositions = saveFileDialog1.FileName ;
+                System.IO.File.WriteAllText(saveFileTilePositions, tileCenterLines);
+
+            }
+        }
+
         private void panel5_Paint(object sender, PaintEventArgs e)
         {
 
@@ -641,10 +672,7 @@ namespace TileDetection
                 this.numericUpDown_contourAreaMax.Value = this.numericUpDown_contourAreaMin.Value;
             }
         }
-
-
-
-             
+   
     }
 
 

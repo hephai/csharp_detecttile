@@ -85,6 +85,8 @@ namespace TileDetection
             this.numericUpDown_tileAreaMinPx = new System.Windows.Forms.NumericUpDown();
             this.label22 = new System.Windows.Forms.Label();
             this.numericUpDown_tileAreaMaxPx = new System.Windows.Forms.NumericUpDown();
+            this.button_saveTile = new System.Windows.Forms.Button();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_contourAreaMax)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_upper_red)).BeginInit();
@@ -135,6 +137,7 @@ namespace TileDetection
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.button_saveTile);
             this.panel1.Controls.Add(this.label22);
             this.panel1.Controls.Add(this.numericUpDown_tileAreaMaxPx);
             this.panel1.Controls.Add(this.label21);
@@ -468,7 +471,7 @@ namespace TileDetection
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer4);
             this.splitContainer2.Size = new System.Drawing.Size(520, 675);
-            this.splitContainer2.SplitterDistance = 213;
+            this.splitContainer2.SplitterDistance = 212;
             this.splitContainer2.TabIndex = 0;
             // 
             // originalImageBox
@@ -478,7 +481,7 @@ namespace TileDetection
             this.originalImageBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.originalImageBox.Location = new System.Drawing.Point(0, 25);
             this.originalImageBox.Name = "originalImageBox";
-            this.originalImageBox.Size = new System.Drawing.Size(520, 188);
+            this.originalImageBox.Size = new System.Drawing.Size(520, 187);
             this.originalImageBox.TabIndex = 3;
             this.originalImageBox.TabStop = false;
             // 
@@ -516,8 +519,8 @@ namespace TileDetection
             // 
             this.splitContainer4.Panel2.Controls.Add(this.out_image3ImageBox);
             this.splitContainer4.Panel2.Controls.Add(this.panel6);
-            this.splitContainer4.Size = new System.Drawing.Size(520, 458);
-            this.splitContainer4.SplitterDistance = 253;
+            this.splitContainer4.Size = new System.Drawing.Size(520, 459);
+            this.splitContainer4.SplitterDistance = 254;
             this.splitContainer4.TabIndex = 0;
             // 
             // out_image1ImageBox
@@ -525,9 +528,9 @@ namespace TileDetection
             this.out_image1ImageBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.out_image1ImageBox.Cursor = System.Windows.Forms.Cursors.Cross;
             this.out_image1ImageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.out_image1ImageBox.Location = new System.Drawing.Point(0, 26);
+            this.out_image1ImageBox.Location = new System.Drawing.Point(0, 25);
             this.out_image1ImageBox.Name = "out_image1ImageBox";
-            this.out_image1ImageBox.Size = new System.Drawing.Size(520, 227);
+            this.out_image1ImageBox.Size = new System.Drawing.Size(520, 229);
             this.out_image1ImageBox.TabIndex = 5;
             this.out_image1ImageBox.TabStop = false;
             // 
@@ -537,7 +540,7 @@ namespace TileDetection
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(0, 0);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(520, 26);
+            this.panel4.Size = new System.Drawing.Size(520, 25);
             this.panel4.TabIndex = 3;
             // 
             // label3
@@ -554,9 +557,9 @@ namespace TileDetection
             this.out_image3ImageBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.out_image3ImageBox.Cursor = System.Windows.Forms.Cursors.Cross;
             this.out_image3ImageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.out_image3ImageBox.Location = new System.Drawing.Point(0, 26);
+            this.out_image3ImageBox.Location = new System.Drawing.Point(0, 25);
             this.out_image3ImageBox.Name = "out_image3ImageBox";
-            this.out_image3ImageBox.Size = new System.Drawing.Size(520, 175);
+            this.out_image3ImageBox.Size = new System.Drawing.Size(520, 176);
             this.out_image3ImageBox.TabIndex = 5;
             this.out_image3ImageBox.TabStop = false;
             // 
@@ -566,7 +569,7 @@ namespace TileDetection
             this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel6.Location = new System.Drawing.Point(0, 0);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(520, 26);
+            this.panel6.Size = new System.Drawing.Size(520, 25);
             this.panel6.TabIndex = 4;
             // 
             // label9
@@ -643,7 +646,7 @@ namespace TileDetection
             this.splitContainer5.Panel2.Controls.Add(this.out_image4ImageBox);
             this.splitContainer5.Panel2.Controls.Add(this.panel7);
             this.splitContainer5.Size = new System.Drawing.Size(535, 457);
-            this.splitContainer5.SplitterDistance = 254;
+            this.splitContainer5.SplitterDistance = 253;
             this.splitContainer5.TabIndex = 0;
             // 
             // out_image2ImageBox
@@ -651,7 +654,7 @@ namespace TileDetection
             this.out_image2ImageBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.out_image2ImageBox.Cursor = System.Windows.Forms.Cursors.Cross;
             this.out_image2ImageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.out_image2ImageBox.Location = new System.Drawing.Point(0, 26);
+            this.out_image2ImageBox.Location = new System.Drawing.Point(0, 25);
             this.out_image2ImageBox.Name = "out_image2ImageBox";
             this.out_image2ImageBox.Size = new System.Drawing.Size(535, 228);
             this.out_image2ImageBox.TabIndex = 4;
@@ -663,14 +666,14 @@ namespace TileDetection
             this.panel5.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel5.Location = new System.Drawing.Point(0, 0);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(535, 26);
+            this.panel5.Size = new System.Drawing.Size(535, 25);
             this.panel5.TabIndex = 3;
             this.panel5.Paint += new System.Windows.Forms.PaintEventHandler(this.panel5_Paint);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(16, 8);
+            this.label4.Location = new System.Drawing.Point(9, 6);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(62, 13);
             this.label4.TabIndex = 0;
@@ -682,9 +685,9 @@ namespace TileDetection
             this.out_image4ImageBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.out_image4ImageBox.Cursor = System.Windows.Forms.Cursors.Cross;
             this.out_image4ImageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.out_image4ImageBox.Location = new System.Drawing.Point(0, 27);
+            this.out_image4ImageBox.Location = new System.Drawing.Point(0, 25);
             this.out_image4ImageBox.Name = "out_image4ImageBox";
-            this.out_image4ImageBox.Size = new System.Drawing.Size(535, 172);
+            this.out_image4ImageBox.Size = new System.Drawing.Size(535, 175);
             this.out_image4ImageBox.TabIndex = 5;
             this.out_image4ImageBox.TabStop = false;
             // 
@@ -694,13 +697,13 @@ namespace TileDetection
             this.panel7.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel7.Location = new System.Drawing.Point(0, 0);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(535, 27);
+            this.panel7.Size = new System.Drawing.Size(535, 25);
             this.panel7.TabIndex = 4;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(9, 11);
+            this.label10.Location = new System.Drawing.Point(9, 7);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(62, 13);
             this.label10.TabIndex = 0;
@@ -786,7 +789,7 @@ namespace TileDetection
             // label20
             // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(665, 54);
+            this.label20.Location = new System.Drawing.Point(678, 54);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(59, 13);
             this.label20.TabIndex = 27;
@@ -794,7 +797,7 @@ namespace TileDetection
             // 
             // numericUpDown_threshhold
             // 
-            this.numericUpDown_threshhold.Location = new System.Drawing.Point(730, 52);
+            this.numericUpDown_threshhold.Location = new System.Drawing.Point(743, 52);
             this.numericUpDown_threshhold.Maximum = new decimal(new int[] {
             255,
             0,
@@ -813,7 +816,7 @@ namespace TileDetection
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(650, 84);
+            this.label21.Location = new System.Drawing.Point(663, 84);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(74, 13);
             this.label21.TabIndex = 29;
@@ -821,7 +824,7 @@ namespace TileDetection
             // 
             // numericUpDown_tileAreaMinPx
             // 
-            this.numericUpDown_tileAreaMinPx.Location = new System.Drawing.Point(730, 82);
+            this.numericUpDown_tileAreaMinPx.Location = new System.Drawing.Point(743, 82);
             this.numericUpDown_tileAreaMinPx.Maximum = new decimal(new int[] {
             99999,
             0,
@@ -840,7 +843,7 @@ namespace TileDetection
             // label22
             // 
             this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(650, 114);
+            this.label22.Location = new System.Drawing.Point(663, 114);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(77, 13);
             this.label22.TabIndex = 31;
@@ -848,7 +851,7 @@ namespace TileDetection
             // 
             // numericUpDown_tileAreaMaxPx
             // 
-            this.numericUpDown_tileAreaMaxPx.Location = new System.Drawing.Point(730, 112);
+            this.numericUpDown_tileAreaMaxPx.Location = new System.Drawing.Point(743, 112);
             this.numericUpDown_tileAreaMaxPx.Maximum = new decimal(new int[] {
             99999,
             0,
@@ -863,6 +866,20 @@ namespace TileDetection
             0,
             0});
             this.numericUpDown_tileAreaMaxPx.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
+            // 
+            // button_saveTile
+            // 
+            this.button_saveTile.Location = new System.Drawing.Point(840, 109);
+            this.button_saveTile.Name = "button_saveTile";
+            this.button_saveTile.Size = new System.Drawing.Size(113, 23);
+            this.button_saveTile.TabIndex = 32;
+            this.button_saveTile.Text = "Save Tile Positions";
+            this.button_saveTile.UseVisualStyleBackColor = true;
+            this.button_saveTile.Click += new System.EventHandler(this.saveTilePositionsButton_Click);
+            // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.AddExtension = global::ShapeDetection.Properties.Settings.Default.txt;
             // 
             // MainForm
             // 
@@ -988,6 +1005,8 @@ namespace TileDetection
         private System.Windows.Forms.NumericUpDown numericUpDown_tileAreaMaxPx;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.NumericUpDown numericUpDown_tileAreaMinPx;
+        private System.Windows.Forms.Button button_saveTile;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 
