@@ -30,6 +30,19 @@ namespace TileDetection
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.tidi_button = new System.Windows.Forms.Button();
+            this.button_saveTile = new System.Windows.Forms.Button();
+            this.label22 = new System.Windows.Forms.Label();
+            this.numericUpDown_tileAreaMaxPx = new System.Windows.Forms.NumericUpDown();
+            this.label21 = new System.Windows.Forms.Label();
+            this.numericUpDown_tileAreaMinPx = new System.Windows.Forms.NumericUpDown();
+            this.label20 = new System.Windows.Forms.Label();
+            this.numericUpDown_threshhold = new System.Windows.Forms.NumericUpDown();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.numericUpDown_heightTransfMmMal10 = new System.Windows.Forms.NumericUpDown();
+            this.label17 = new System.Windows.Forms.Label();
+            this.numericUpDown_widthTransfMmMal10 = new System.Windows.Forms.NumericUpDown();
             this.label16 = new System.Windows.Forms.Label();
             this.numericUpDown_contourAreaMax = new System.Windows.Forms.NumericUpDown();
             this.label15 = new System.Windows.Forms.Label();
@@ -74,20 +87,13 @@ namespace TileDetection
             this.panel7 = new System.Windows.Forms.Panel();
             this.label10 = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.label17 = new System.Windows.Forms.Label();
-            this.numericUpDown_widthTransfMmMal10 = new System.Windows.Forms.NumericUpDown();
-            this.label18 = new System.Windows.Forms.Label();
-            this.numericUpDown_heightTransfMmMal10 = new System.Windows.Forms.NumericUpDown();
-            this.label19 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.numericUpDown_threshhold = new System.Windows.Forms.NumericUpDown();
-            this.label21 = new System.Windows.Forms.Label();
-            this.numericUpDown_tileAreaMinPx = new System.Windows.Forms.NumericUpDown();
-            this.label22 = new System.Windows.Forms.Label();
-            this.numericUpDown_tileAreaMaxPx = new System.Windows.Forms.NumericUpDown();
-            this.button_saveTile = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tileAreaMaxPx)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tileAreaMinPx)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_threshhold)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_heightTransfMmMal10)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_widthTransfMmMal10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_contourAreaMax)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_upper_red)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_lower_red)).BeginInit();
@@ -128,15 +134,11 @@ namespace TileDetection
             this.panel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.out_image4ImageBox)).BeginInit();
             this.panel7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_widthTransfMmMal10)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_heightTransfMmMal10)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_threshhold)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tileAreaMinPx)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tileAreaMaxPx)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.tidi_button);
             this.panel1.Controls.Add(this.button_saveTile);
             this.panel1.Controls.Add(this.label22);
             this.panel1.Controls.Add(this.numericUpDown_tileAreaMaxPx);
@@ -174,6 +176,180 @@ namespace TileDetection
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1059, 166);
             this.panel1.TabIndex = 0;
+            // 
+            // tidi_button
+            // 
+            this.tidi_button.Location = new System.Drawing.Point(892, 43);
+            this.tidi_button.Name = "tidi_button";
+            this.tidi_button.Size = new System.Drawing.Size(75, 23);
+            this.tidi_button.TabIndex = 33;
+            this.tidi_button.Text = "tidi_button";
+            this.tidi_button.UseVisualStyleBackColor = true;
+            this.tidi_button.Click += new System.EventHandler(this.tidi_button_Click);
+            // 
+            // button_saveTile
+            // 
+            this.button_saveTile.Location = new System.Drawing.Point(840, 109);
+            this.button_saveTile.Name = "button_saveTile";
+            this.button_saveTile.Size = new System.Drawing.Size(113, 23);
+            this.button_saveTile.TabIndex = 32;
+            this.button_saveTile.Text = "Save Tile Positions";
+            this.button_saveTile.UseVisualStyleBackColor = true;
+            this.button_saveTile.Click += new System.EventHandler(this.saveTilePositionsButton_Click);
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(663, 114);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(77, 13);
+            this.label22.TabIndex = 31;
+            this.label22.Text = "tileAreaMaxPx:";
+            // 
+            // numericUpDown_tileAreaMaxPx
+            // 
+            this.numericUpDown_tileAreaMaxPx.Location = new System.Drawing.Point(743, 112);
+            this.numericUpDown_tileAreaMaxPx.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numericUpDown_tileAreaMaxPx.Name = "numericUpDown_tileAreaMaxPx";
+            this.numericUpDown_tileAreaMaxPx.Size = new System.Drawing.Size(48, 20);
+            this.numericUpDown_tileAreaMaxPx.TabIndex = 30;
+            this.numericUpDown_tileAreaMaxPx.Value = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
+            this.numericUpDown_tileAreaMaxPx.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(663, 84);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(74, 13);
+            this.label21.TabIndex = 29;
+            this.label21.Text = "tileAreaMinPx:";
+            // 
+            // numericUpDown_tileAreaMinPx
+            // 
+            this.numericUpDown_tileAreaMinPx.Location = new System.Drawing.Point(743, 82);
+            this.numericUpDown_tileAreaMinPx.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numericUpDown_tileAreaMinPx.Name = "numericUpDown_tileAreaMinPx";
+            this.numericUpDown_tileAreaMinPx.Size = new System.Drawing.Size(48, 20);
+            this.numericUpDown_tileAreaMinPx.TabIndex = 28;
+            this.numericUpDown_tileAreaMinPx.Value = new decimal(new int[] {
+            1500,
+            0,
+            0,
+            0});
+            this.numericUpDown_tileAreaMinPx.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(678, 54);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(59, 13);
+            this.label20.TabIndex = 27;
+            this.label20.Text = "threshhold:";
+            // 
+            // numericUpDown_threshhold
+            // 
+            this.numericUpDown_threshhold.Location = new System.Drawing.Point(743, 52);
+            this.numericUpDown_threshhold.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numericUpDown_threshhold.Name = "numericUpDown_threshhold";
+            this.numericUpDown_threshhold.Size = new System.Drawing.Size(48, 20);
+            this.numericUpDown_threshhold.TabIndex = 26;
+            this.numericUpDown_threshhold.Value = new decimal(new int[] {
+            80,
+            0,
+            0,
+            0});
+            this.numericUpDown_threshhold.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(627, 54);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(32, 13);
+            this.label19.TabIndex = 25;
+            this.label19.Text = "Tiles:";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(442, 84);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(115, 13);
+            this.label18.TabIndex = 24;
+            this.label18.Text = "heightTransfMmMal10:";
+            // 
+            // numericUpDown_heightTransfMmMal10
+            // 
+            this.numericUpDown_heightTransfMmMal10.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDown_heightTransfMmMal10.Location = new System.Drawing.Point(558, 82);
+            this.numericUpDown_heightTransfMmMal10.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+            this.numericUpDown_heightTransfMmMal10.Name = "numericUpDown_heightTransfMmMal10";
+            this.numericUpDown_heightTransfMmMal10.Size = new System.Drawing.Size(48, 20);
+            this.numericUpDown_heightTransfMmMal10.TabIndex = 23;
+            this.numericUpDown_heightTransfMmMal10.Value = new decimal(new int[] {
+            800,
+            0,
+            0,
+            0});
+            this.numericUpDown_heightTransfMmMal10.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(442, 54);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(111, 13);
+            this.label17.TabIndex = 22;
+            this.label17.Text = "widthTransfMmMal10:";
+            // 
+            // numericUpDown_widthTransfMmMal10
+            // 
+            this.numericUpDown_widthTransfMmMal10.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDown_widthTransfMmMal10.Location = new System.Drawing.Point(558, 52);
+            this.numericUpDown_widthTransfMmMal10.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+            this.numericUpDown_widthTransfMmMal10.Name = "numericUpDown_widthTransfMmMal10";
+            this.numericUpDown_widthTransfMmMal10.Size = new System.Drawing.Size(48, 20);
+            this.numericUpDown_widthTransfMmMal10.TabIndex = 21;
+            this.numericUpDown_widthTransfMmMal10.Value = new decimal(new int[] {
+            1400,
+            0,
+            0,
+            0});
+            this.numericUpDown_widthTransfMmMal10.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
             // 
             // label16
             // 
@@ -347,9 +523,9 @@ namespace TileDetection
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(181, 54);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(63, 13);
+            this.label8.Size = new System.Drawing.Size(61, 13);
             this.label8.TabIndex = 8;
-            this.label8.Text = "upper_blue:";
+            this.label8.Text = "upper_bue:";
             // 
             // label7
             // 
@@ -388,9 +564,9 @@ namespace TileDetection
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(73, 54);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(61, 13);
+            this.label6.Size = new System.Drawing.Size(59, 13);
             this.label6.TabIndex = 4;
-            this.label6.Text = "lower_blue:";
+            this.label6.Text = "lower_bue:";
             // 
             // numericUpDown_lower_blue
             // 
@@ -668,7 +844,6 @@ namespace TileDetection
             this.panel5.Name = "panel5";
             this.panel5.Size = new System.Drawing.Size(535, 25);
             this.panel5.TabIndex = 3;
-            this.panel5.Paint += new System.Windows.Forms.PaintEventHandler(this.panel5_Paint);
             // 
             // label4
             // 
@@ -678,7 +853,6 @@ namespace TileDetection
             this.label4.Size = new System.Drawing.Size(62, 13);
             this.label4.TabIndex = 0;
             this.label4.Text = "out_image2";
-            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // out_image4ImageBox
             // 
@@ -713,170 +887,6 @@ namespace TileDetection
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(442, 54);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(111, 13);
-            this.label17.TabIndex = 22;
-            this.label17.Text = "widthTransfMmMal10:";
-            // 
-            // numericUpDown_widthTransfMmMal10
-            // 
-            this.numericUpDown_widthTransfMmMal10.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.numericUpDown_widthTransfMmMal10.Location = new System.Drawing.Point(558, 52);
-            this.numericUpDown_widthTransfMmMal10.Maximum = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-            this.numericUpDown_widthTransfMmMal10.Name = "numericUpDown_widthTransfMmMal10";
-            this.numericUpDown_widthTransfMmMal10.Size = new System.Drawing.Size(48, 20);
-            this.numericUpDown_widthTransfMmMal10.TabIndex = 21;
-            this.numericUpDown_widthTransfMmMal10.Value = new decimal(new int[] {
-            1400,
-            0,
-            0,
-            0});
-            this.numericUpDown_widthTransfMmMal10.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(442, 84);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(115, 13);
-            this.label18.TabIndex = 24;
-            this.label18.Text = "heightTransfMmMal10:";
-            // 
-            // numericUpDown_heightTransfMmMal10
-            // 
-            this.numericUpDown_heightTransfMmMal10.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.numericUpDown_heightTransfMmMal10.Location = new System.Drawing.Point(558, 82);
-            this.numericUpDown_heightTransfMmMal10.Maximum = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-            this.numericUpDown_heightTransfMmMal10.Name = "numericUpDown_heightTransfMmMal10";
-            this.numericUpDown_heightTransfMmMal10.Size = new System.Drawing.Size(48, 20);
-            this.numericUpDown_heightTransfMmMal10.TabIndex = 23;
-            this.numericUpDown_heightTransfMmMal10.Value = new decimal(new int[] {
-            800,
-            0,
-            0,
-            0});
-            this.numericUpDown_heightTransfMmMal10.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(627, 54);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(32, 13);
-            this.label19.TabIndex = 25;
-            this.label19.Text = "Tiles:";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(678, 54);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(59, 13);
-            this.label20.TabIndex = 27;
-            this.label20.Text = "threshhold:";
-            // 
-            // numericUpDown_threshhold
-            // 
-            this.numericUpDown_threshhold.Location = new System.Drawing.Point(743, 52);
-            this.numericUpDown_threshhold.Maximum = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
-            this.numericUpDown_threshhold.Name = "numericUpDown_threshhold";
-            this.numericUpDown_threshhold.Size = new System.Drawing.Size(48, 20);
-            this.numericUpDown_threshhold.TabIndex = 26;
-            this.numericUpDown_threshhold.Value = new decimal(new int[] {
-            80,
-            0,
-            0,
-            0});
-            this.numericUpDown_threshhold.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(663, 84);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(74, 13);
-            this.label21.TabIndex = 29;
-            this.label21.Text = "tileAreaMinPx:";
-            // 
-            // numericUpDown_tileAreaMinPx
-            // 
-            this.numericUpDown_tileAreaMinPx.Location = new System.Drawing.Point(743, 82);
-            this.numericUpDown_tileAreaMinPx.Maximum = new decimal(new int[] {
-            99999,
-            0,
-            0,
-            0});
-            this.numericUpDown_tileAreaMinPx.Name = "numericUpDown_tileAreaMinPx";
-            this.numericUpDown_tileAreaMinPx.Size = new System.Drawing.Size(48, 20);
-            this.numericUpDown_tileAreaMinPx.TabIndex = 28;
-            this.numericUpDown_tileAreaMinPx.Value = new decimal(new int[] {
-            1500,
-            0,
-            0,
-            0});
-            this.numericUpDown_tileAreaMinPx.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(663, 114);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(77, 13);
-            this.label22.TabIndex = 31;
-            this.label22.Text = "tileAreaMaxPx:";
-            // 
-            // numericUpDown_tileAreaMaxPx
-            // 
-            this.numericUpDown_tileAreaMaxPx.Location = new System.Drawing.Point(743, 112);
-            this.numericUpDown_tileAreaMaxPx.Maximum = new decimal(new int[] {
-            99999,
-            0,
-            0,
-            0});
-            this.numericUpDown_tileAreaMaxPx.Name = "numericUpDown_tileAreaMaxPx";
-            this.numericUpDown_tileAreaMaxPx.Size = new System.Drawing.Size(48, 20);
-            this.numericUpDown_tileAreaMaxPx.TabIndex = 30;
-            this.numericUpDown_tileAreaMaxPx.Value = new decimal(new int[] {
-            3000,
-            0,
-            0,
-            0});
-            this.numericUpDown_tileAreaMaxPx.ValueChanged += new System.EventHandler(this.numericUpDown_Global_ValueChanged);
-            // 
-            // button_saveTile
-            // 
-            this.button_saveTile.Location = new System.Drawing.Point(840, 109);
-            this.button_saveTile.Name = "button_saveTile";
-            this.button_saveTile.Size = new System.Drawing.Size(113, 23);
-            this.button_saveTile.TabIndex = 32;
-            this.button_saveTile.Text = "Save Tile Positions";
-            this.button_saveTile.UseVisualStyleBackColor = true;
-            this.button_saveTile.Click += new System.EventHandler(this.saveTilePositionsButton_Click);
-            // 
             // saveFileDialog1
             // 
             this.saveFileDialog1.AddExtension = global::ShapeDetection.Properties.Settings.Default.txt;
@@ -892,6 +902,11 @@ namespace TileDetection
             this.Text = "Tile Detection";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tileAreaMaxPx)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tileAreaMinPx)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_threshhold)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_heightTransfMmMal10)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_widthTransfMmMal10)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_contourAreaMax)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_upper_red)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_lower_red)).EndInit();
@@ -938,11 +953,6 @@ namespace TileDetection
             ((System.ComponentModel.ISupportInitialize)(this.out_image4ImageBox)).EndInit();
             this.panel7.ResumeLayout(false);
             this.panel7.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_widthTransfMmMal10)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_heightTransfMmMal10)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_threshhold)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tileAreaMinPx)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tileAreaMaxPx)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1007,6 +1017,7 @@ namespace TileDetection
         private System.Windows.Forms.NumericUpDown numericUpDown_tileAreaMinPx;
         private System.Windows.Forms.Button button_saveTile;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.Button tidi_button;
     }
 }
 

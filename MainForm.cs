@@ -277,9 +277,455 @@ namespace TileDetection
             return transfMat;
         }
 
-        string tileCenterLines = "X, Y";
+        const int CV_QR_NORTH = 0;
+        const int CV_QR_EAST = 1;
+        const int CV_QR_SOUTH = 2;
+        const int CV_QR_WEST = 3;
 
-        public void DetectFiducialPointsPerspectiveMat()
+
+        public Mat detectQRPointsPerspectiveMat(Image<Bgr, Byte> in_image, IImage transform_output, MCvScalar lower, MCvScalar upper, int width, int height)
+        {
+            Mat transfMat = new Mat(); //return
+            PointF[] dstTransfRect = new PointF[4] { new Point(0, height), new Point(0, 0), new Point(width, 0), new Point(width, height) };
+
+            // QR hierarchy erkennen http://dsynflo.blogspot.ch/2014/10/opencv-qr-code-detection-and-extraction.html
+
+            //UMat yellow_output = new UMat(in_image.Size, DepthType.Cv8U, 1);
+            //geht mit UMat nicht, da Canny einen Bug hat http://code.opencv.org/issues/4120
+
+            Image<Gray, Byte> pyr_image = new Image<Gray, Byte>(in_image.Size);
+            CvInvoke.PyrUp(in_image, pyr_image);
+            CvInvoke.PyrDown(pyr_image, pyr_image);
+            
+
+            //UMat canny_output = new UMat(morphed_image.Size, DepthType.Cv8U, 1);
+            Image<Gray, Byte> canny_output = new Image<Gray, Byte>(in_image.Size);
+
+            // AdaptiveThreshold bringt nichts, weil InRange schon ein Binary Image liefert
+            //CvInvoke.AdaptiveThreshold(morphed_image, canny_output, 50, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 5);
+
+            using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
+            using (VectorOfVectorOfPoint boxes = new VectorOfVectorOfPoint())
+            using (Mat hierarchy = new Mat())
+            {
+                CvInvoke.Canny(in_image, canny_output, 30, 60, 3, true);
+                out_image0ImageBox.Image = canny_output;
+
+                //UMat canny_output_mod = new UMat();
+                Image<Gray, Byte> canny_output_mod = new Image<Gray, Byte>(canny_output.Bitmap);
+                //CvInvoke.FindContours(canny_output_mod, contours, hierarchy, RetrType.Tree, ChainApproxMethod.ChainApproxSimple, new Point(0, 0));
+                int[,] hierar;
+                hierar = CvInvoke.FindContourTree(canny_output_mod, contours, ChainApproxMethod.ChainApproxSimple);
+                //ArraySegment<int> hierar0 = new ArraySegment<int>(hierar.); 
+                // testen ob eine contour 8 weitere untercontouren hat
+                // erst unterste contour finden hierarchy[i][1] = -1, dann schauen bis hierarchy[i][0] in hierarchy[x][1] nicht mehr zu finden ist (sollte bei validen contours 7 mal funktionieren)
+                // abbruch wenn mehr als einmal zur finden
+                // oder gar nicht zu finden
+                int mark = 0, A = 0, B = 0, C = 0;
+                int top = 0, outlier = 0, median1 = 0, median2 = 0;
+                List<int> qrFidsL = new List<int>();
+                for (int i = 0; i < hierar.GetLength(0); i++)
+                {
+                    int actc = i;
+                    int anzSubC = 0;
+                    //canny_output.Draw(i.ToString(), contours[i][0], FontFace.HersheyComplexSmall, 1, new Gray(255));
+                    while (hierar[actc, 2] != -1)
+                    {
+                        actc = hierar[actc, 2];
+                        anzSubC = anzSubC + 1;
+                    }
+                    if (anzSubC >= 6)
+                    {
+                        // contours nicht in die Liste schreiben wenn schon der parent in der qrFidsL Liste ist, 
+                        //was ist dann mit dem child,child?
+                        int foundC = qrFidsL.Find(item => item == hierar[i, 3]);
+                        if (foundC == 0)
+                        {
+                            qrFidsL.Add(i);
+                            canny_output.Draw(i.ToString(), contours[i][0], FontFace.HersheyComplexSmall, 1, new Gray(255));
+
+                            if (mark == 0) A = mark; //i;
+                            else if (mark == 1) B = mark; //i;      // i.e., A is already found, assign current contour to B
+                            else if (mark == 2) C = mark; //i;      // i.e., A and B are already found, assign current contour to C
+                            mark = mark + 1;
+                        }
+                    }
+                }
+
+                //per distance den A, B, C herausfinden
+                List<MCvMoments> momentL = new List<MCvMoments>();
+                List<PointF> massCenterL = new List<PointF>();
+                for (int i = 0; i < qrFidsL.Count; i++)
+                {
+                    momentL.Add(CvInvoke.Moments(contours[qrFidsL.ElementAt(i)], false));
+                    //massCenterL[i] = new PointF((float)(momentL[i].M10 / momentL[i].M00), (float)(momentL[i].M01 / momentL[i].M00));
+                    massCenterL.Add(new PointF((float)momentL[i].GravityCenter.X, (float)momentL[i].GravityCenter.Y));
+                }
+
+                // jetzt sollten nur exakt 3 Fids existieren
+                if (qrFidsL.Count == 3)
+                {
+                    float distAB = cv_distance(massCenterL[0], massCenterL[1]);
+                    float distCA = cv_distance(massCenterL[0], massCenterL[2]);
+                    float distBC = cv_distance(massCenterL[1], massCenterL[2]);
+
+                    if (distAB > distBC && distAB > distCA)
+                    {
+                        outlier = C; median1 = A; median2 = B;
+                    }
+                    else if (distCA > distAB && distCA > distBC)
+                    {
+                        outlier = B; median1 = A; median2 = C;
+                    }
+                    else if (distBC > distAB && distBC > distCA)
+                    {
+                        outlier = A; median1 = B; median2 = C;
+                    }
+
+                    top = outlier;
+
+                    canny_output.Draw(" A:" + A.ToString(), contours[qrFidsL.ElementAt(A)][0], FontFace.HersheyComplexSmall, 2, new Gray(255));
+                    canny_output.Draw(" B:" + B.ToString(), contours[qrFidsL.ElementAt(B)][0], FontFace.HersheyComplexSmall, 2, new Gray(255));
+                    canny_output.Draw(" C:" + C.ToString(), contours[qrFidsL.ElementAt(C)][0], FontFace.HersheyComplexSmall, 2, new Gray(255));
+
+                    float dist = 0;
+                    float slope = 0;
+                    int align = 0;
+                    int orientation = 0;
+                    int right = 0;
+                    int bottom = 0;
+                    dist = cv_lineEquation(massCenterL[median1], massCenterL[median2], massCenterL[outlier]);  // Get the Perpendicular distance of the outlier from the longest side			
+                    slope = cv_lineSlope(massCenterL[median1], massCenterL[median2], ref align);      // Also calculate the slope of the longest side
+
+                    // Now that we have the orientation of the line formed median1 & median2 and we also have the position of the outlier w.r.t. the line
+                    // Determine the 'right' and 'bottom' markers
+
+                    if (align == 0)
+                    {
+                        bottom = median1;
+                        right = median2;
+                    }
+                    else if (slope < 0 && dist < 0)     // Orientation - North
+                    {
+                        bottom = median1;
+                        right = median2;
+                        orientation = CV_QR_NORTH;
+                    }
+                    else if (slope > 0 && dist < 0)     // Orientation - East
+                    {
+                        right = median1;
+                        bottom = median2;
+                        orientation = CV_QR_EAST;
+                    }
+                    else if (slope < 0 && dist > 0)     // Orientation - South			
+                    {
+                        right = median1;
+                        bottom = median2;
+                        orientation = CV_QR_SOUTH;
+                    }
+
+                    else if (slope > 0 && dist > 0)     // Orientation - West
+                    {
+                        bottom = median1;
+                        right = median2;
+                        orientation = CV_QR_WEST;
+                    }
+
+
+                    //--------
+                    // To ensure any unintended values do not sneak up when QR code is not present
+//                    float area_top, area_right, area_bottom;
+
+                    if (top < contours.Size && right < contours.Size && bottom < contours.Size && CvInvoke.ContourArea(contours[qrFidsL.ElementAt(top)]) > 10 && CvInvoke.ContourArea(contours[qrFidsL.ElementAt(right)]) > 10 && CvInvoke.ContourArea(contours[qrFidsL.ElementAt(bottom)]) > 10)
+                    {
+
+                        VectorOfPointF L = new VectorOfPointF();
+                        VectorOfPointF M = new VectorOfPointF();
+                        VectorOfPointF O = new VectorOfPointF();
+                        VectorOfPointF tempL = new VectorOfPointF();
+                        VectorOfPointF tempM = new VectorOfPointF();
+                        VectorOfPointF tempO = new VectorOfPointF();
+                        PointF N = new PointF();
+
+                        VectorOfPointF src = new VectorOfPointF();
+                        VectorOfPointF dst = new VectorOfPointF();       // src - Source Points basically the 4 end co-ordinates of the overlay image
+                                                                         // dst - Destination Points to transform overlay image	
+
+                        Mat warp_matrix;
+
+                        cv_getVertices(contours, qrFidsL.ElementAt(top), slope, ref tempL);
+                        cv_getVertices(contours, qrFidsL.ElementAt(right), slope, ref tempM);
+                        cv_getVertices(contours, qrFidsL.ElementAt(bottom), slope, ref tempO);
+
+                        cv_updateCornerOr(orientation, tempL, ref L);           // Re-arrange marker corners w.r.t orientation of the QR code
+                        cv_updateCornerOr(orientation, tempM, ref M);           // Re-arrange marker corners w.r.t orientation of the QR code
+                        cv_updateCornerOr(orientation, tempO, ref O);           // Re-arrange marker corners w.r.t orientation of the QR code
+
+                        bool iflag = getIntersectionPoint(M[1], M[2], O[3], O[2], ref N);
+
+                        PointF[] srcA = { L[0], M[1], N, O[3] };
+                        src.Push(srcA);
+
+                        PointF[] dstA = { new PointF(0, 0), new PointF(transform_output.Size.Width, 0), new PointF(transform_output.Size.Width, transform_output.Size.Height), new PointF(0, transform_output.Size.Height) };
+                        dst.Push(dstA);
+
+                        if (src.Size == 4 && dst.Size == 4)         // Failsafe for WarpMatrix Calculation to have only 4 Points with src and dst
+                        {
+                            transfMat = CvInvoke.GetPerspectiveTransform(src, dst);
+                            CvInvoke.WarpPerspective(in_image, transform_output, transfMat, transform_output.Size);
+                            //                           CvInvoke.CopyMakeBorder(transform_output, qr, 10, 10, 10, 10, BORDER_CONSTANT, Scalar(255, 255, 255));
+
+                            //                            CvInvoke.CvtColor(qr, qr_gray, CV_RGB2GRAY);
+                            //                            CvInvoke.Threshold(qr_gray, qr_thres, 127, 255, CV_THRESH_BINARY);
+
+                            //threshold(qr_gray, qr_thres, 0, 255, CV_THRESH_OTSU);
+                            //for( int d=0 ; d < 4 ; d++){	src.pop_back(); dst.pop_back(); }
+                        }
+                    }
+                }
+            }            
+            out_image1ImageBox.Image = transform_output;
+
+            return transfMat;
+        }
+
+        float cv_distance(PointF a, PointF b)
+        {
+            return (float)Math.Sqrt(Math.Pow(Math.Abs(a.X - b.X), 2) + Math.Pow(Math.Abs(a.Y - b.Y), 2));
+        }
+
+        // Function: Perpendicular Distance of a Point J from line formed by Points L and M; Equation of the line ax+by+c=0
+        // Description: Given 3 points, the function derives the line quation of the first two points,
+        //	  calculates and returns the perpendicular distance of the the 3rd point from this line.
+
+        float cv_lineEquation(PointF L, PointF M, PointF J)
+        {
+            float a, b, c, pdist;
+
+            a = -((M.Y - L.Y) / (M.X - L.X));
+            b = 1;
+            c = (((M.Y - L.Y) / (M.X - L.X)) * L.X) - L.Y;
+
+            // Now that we have a, b, c from the equation ax + by + c, time to substitute (x,y) by values from the Point J
+
+            pdist = (a * J.X + (b * J.Y) + c) / (float)Math.Sqrt((a * a) + (b * b));
+            return pdist;
+        }
+
+        // Function: Slope of a line by two Points L and M on it; Slope of line, S = (x1 -x2) / (y1- y2)
+        // Description: Function returns the slope of the line formed by given 2 points, the alignement flag
+        //	  indicates the line is vertical and the slope is infinity.
+
+        float cv_lineSlope(PointF L, PointF M, ref int alignement)
+        {
+            float dx, dy;
+            dx = M.X - L.X;
+            dy = M.Y - L.Y;
+
+            if (dy != 0)
+            {
+                alignement = 1;
+                return (dy / dx);
+            }
+            else                // Make sure we are not dividing by zero; so use 'alignement' flag
+            {
+                alignement = 0;
+                return 0;
+            }
+        }
+
+        // Function: Routine to calculate 4 Corners of the Marker in Image Space using Region partitioning
+        // Theory: OpenCV Contours stores all points that describe it and these points lie the perimeter of the polygon.
+        //	The below function chooses the farthest points of the polygon since they form the vertices of that polygon,
+        //	exactly the points we are looking for. To choose the farthest point, the polygon is divided/partitioned into
+        //	4 regions equal regions using bounding box. Distance algorithm is applied between the centre of bounding box
+        //	every contour point in that region, the farthest point is deemed as the vertex of that region. Calculating
+        //	for all 4 regions we obtain the 4 corners of the polygon ( - quadrilateral).
+        void cv_getVertices(VectorOfVectorOfPoint contours, int c_id, float slope, ref VectorOfPointF quad)
+        {
+            Rectangle box;
+            box = CvInvoke.BoundingRectangle(contours[c_id]);
+
+            PointF M0 = new PointF();
+            PointF M1 = new PointF();
+            PointF M2 = new PointF();
+            PointF M3 = new PointF();
+            PointF A, B, C, D, W, X, Y, Z;
+
+            A = box.Location;  //box.tl(); 
+            //B.X = box.Right; // box.br().x;
+            //B.Y = box.Left; // box.tl().y;
+            B = new PointF(box.Right, box.Left);
+            C = new PointF(box.Right, box.Bottom);// box.br();
+            //D.X = box.Top ; //box.tl().x;
+            //D.Y = box.Bottom ; //box.br().y;
+            D = new PointF(box.Top, box.Bottom);
+
+
+            //W.x = (A.x + B.x) / 2;
+            //W.y = A.y;
+            W = new PointF((A.X + B.X) / 2, A.Y);
+
+            //X.x = B.x;
+            //X.y = (B.y + C.y) / 2;
+            X = new PointF(B.X, (B.Y + C.Y) / 2);
+
+            //Y.x = (C.x + D.x) / 2;
+            //Y.y = C.y;
+            Y = new PointF((C.X + D.X) / 2, C.Y);
+
+            //Z.x = D.x;
+            //Z.y = (D.y + A.y) / 2;
+            Z = new PointF(D.X, (D.Y + A.Y) / 2);
+
+            float[] dmax = new float[4];
+            dmax[0] = 0;
+            dmax[1] = 0;
+            dmax[2] = 0;
+            dmax[3] = 0;
+
+            float pd1 = 0;
+            float pd2 = 0;
+
+            if (slope > 5 || slope < -5)
+            {
+
+                for (int i = 0; i < contours[c_id].Size; i++)
+                {
+                    pd1 = cv_lineEquation(C, A, contours[c_id][i]); // Position of point w.r.t the diagonal AC 
+                    pd2 = cv_lineEquation(B, D, contours[c_id][i]); // Position of point w.r.t the diagonal BD
+
+                    if ((pd1 >= 0.0) && (pd2 > 0.0))
+                    {
+                        cv_updateCorner(contours[c_id][i], W, ref dmax[1], ref M1);
+                    }
+                    else if ((pd1 > 0.0) && (pd2 <= 0.0))
+                    {
+                        cv_updateCorner(contours[c_id][i], X, ref dmax[2], ref M2);
+                    }
+                    else if ((pd1 <= 0.0) && (pd2 < 0.0))
+                    {
+                        cv_updateCorner(contours[c_id][i], Y, ref dmax[3], ref M3);
+                    }
+                    else if ((pd1 < 0.0) && (pd2 >= 0.0))
+                    {
+                        cv_updateCorner(contours[c_id][i], Z, ref dmax[0], ref M0);
+                    }
+                    else
+                        continue;
+                }
+            }
+            else
+            {
+                int halfx = (int)((A.X + B.X) / 2);
+                int halfy = (int)((A.Y + D.Y) / 2);
+
+                for (int i = 0; i < contours[c_id].Size; i++)
+                {
+                    if ((contours[c_id][i].X < halfx) && (contours[c_id][i].Y <= halfy))
+                    {
+                        cv_updateCorner(contours[c_id][i], C, ref dmax[2], ref M0);
+                    }
+                    else if ((contours[c_id][i].X >= halfx) && (contours[c_id][i].Y < halfy))
+                    {
+                        cv_updateCorner(contours[c_id][i], D, ref dmax[3], ref M1);
+                    }
+                    else if ((contours[c_id][i].X > halfx) && (contours[c_id][i].Y >= halfy))
+                    {
+                        cv_updateCorner(contours[c_id][i], A, ref dmax[0], ref M2);
+                    }
+                    else if ((contours[c_id][i].X <= halfx) && (contours[c_id][i].Y > halfy))
+                    {
+                        cv_updateCorner(contours[c_id][i], B, ref dmax[1], ref M3);
+                    }
+                }
+            }
+
+            PointF[] quadA = { M0, M1, M2, M3 };
+            quad.Push(quadA);
+
+        }
+
+        // Function: Compare a point if it more far than previously recorded farthest distance
+        // Description: Farthest Point detection using reference point and baseline distance
+        void cv_updateCorner(PointF P, PointF reference , ref float baseline, ref PointF corner)
+        {
+            float temp_dist;
+            temp_dist = cv_distance(P, reference);
+
+            if (temp_dist > baseline)
+            {
+                baseline = temp_dist;           // The farthest distance is the new baseline
+                corner = P;                     // P is now the farthest point
+            }
+
+        }
+
+        // Function: Sequence the Corners wrt to the orientation of the QR Code
+        void cv_updateCornerOr(int orientation, VectorOfPointF IN, ref VectorOfPointF OUT)
+        {
+            PointF M0 = new PointF();
+            PointF M1 = new PointF();
+            PointF M2 = new PointF();
+            PointF M3 = new PointF(); 
+            if (orientation == CV_QR_NORTH)
+            {
+                M0 = IN[0];
+                M1 = IN[1];
+                M2 = IN[2];
+                M3 = IN[3];
+            }
+            else if (orientation == CV_QR_EAST)
+            {
+                M0 = IN[1];
+                M1 = IN[2];
+                M2 = IN[3];
+                M3 = IN[0];
+            }
+            else if (orientation == CV_QR_SOUTH)
+            {
+                M0 = IN[2];
+                M1 = IN[3];
+                M2 = IN[0];
+                M3 = IN[1];
+            }
+            else if (orientation == CV_QR_WEST)
+            {
+                M0 = IN[3];
+                M1 = IN[0];
+                M2 = IN[1];
+                M3 = IN[2];
+            }
+
+            PointF[] OUTA = { M0, M1, M2, M3 };
+            OUT.Push(OUTA);
+ 
+        }
+
+        // Function: Get the Intersection Point of the lines formed by sets of two points
+        bool getIntersectionPoint(PointF a1, PointF a2, PointF b1, PointF b2, ref PointF intersection)
+        {
+            PointF p = a1;
+            PointF q = b1;
+            PointF r = new PointF(a2.X - a1.X, a2.Y - a1.Y);
+            PointF s = new PointF(b2.X - b1.X, b2.Y - b1.Y);
+
+            if (cross(r, s) == 0) { return false; }
+
+            float t = cross(new PointF(q.X - p.X, q.Y - p.Y), s) / cross(r, s);
+
+            intersection = PointF.Add(p,new SizeF(t * r.X, t * r.Y));
+            return true;
+        }
+
+        float cross(PointF v1, PointF v2)
+        {
+            return v1.X * v2.Y - v1.Y * v2.X;
+        }
+
+        string tileCenterLines = "";
+
+        public void runDetectTile()
         {
             if (fileNameTextBox.Text != String.Empty)
             {
@@ -309,9 +755,13 @@ namespace TileDetection
                 int widthTransfmmMal10 =  (int)numericUpDown_widthTransfMmMal10.Value ;
                 int heightTransfmmMal10 = (int)numericUpDown_heightTransfMmMal10.Value;
 
+
+                
+
                 Image<Bgr, byte> transform_output = new Image<Bgr, byte>(widthTransfmmMal10, heightTransfmmMal10);
                 Mat transfMat = new Mat();
-                transfMat = detectFiducialPointsPerspectiveMat(in_image, transform_output, bgrFiltLower, bgrFiltUpper, widthTransfmmMal10, heightTransfmmMal10);
+                //transfMat = detectFiducialPointsPerspectiveMat(in_image, transform_output, bgrFiltLower, bgrFiltUpper, widthTransfmmMal10, heightTransfmmMal10);
+                transfMat = detectQRPointsPerspectiveMat(in_image, transform_output, bgrFiltLower, bgrFiltUpper, widthTransfmmMal10, heightTransfmmMal10);
 
                 out_image2ImageBox.Image = transform_output;
                 List<RotatedRect> tileRrectsL = new List<RotatedRect>();
@@ -396,11 +846,6 @@ namespace TileDetection
 
                 detectTilesCenter(in_image);
             }
-        }
-
-        public void saveTilePositions()
-        {
-
         }
 
         public void PerformShapeDetection()
@@ -545,20 +990,18 @@ namespace TileDetection
                 #endregion
             }
         }
-
-
-
+        
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             //PerformShapeDetection();
             //DetectTile();
-            DetectFiducialPointsPerspectiveMat();
+            runDetectTile();
         }
 
         private void numericUpDown_Global_ValueChanged(object sender, EventArgs e)
         {
             //DetectTile();
-            DetectFiducialPointsPerspectiveMat();
+            runDetectTile();
         }
 
         private void loadImageButton_Click(object sender, EventArgs e)
@@ -583,15 +1026,7 @@ namespace TileDetection
             }
         }
 
-        private void panel5_Paint(object sender, PaintEventArgs e)
-        {
 
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void numericUpDown_lower_blue_ValueChanged(object sender, EventArgs e)
         {
@@ -600,7 +1035,7 @@ namespace TileDetection
                 this.numericUpDown_upper_blue.Value = this.numericUpDown_lower_blue.Value;
             }
             //DetectTile();
-            DetectFiducialPointsPerspectiveMat();
+            runDetectTile();
         }
 
         private void numericUpDown_upper_blue_ValueChanged(object sender, EventArgs e)
@@ -611,7 +1046,7 @@ namespace TileDetection
             }
 
             //DetectTile();
-            DetectFiducialPointsPerspectiveMat();
+            runDetectTile();
         }
 
         private void numericUpDown_lower_green_ValueChanged(object sender, EventArgs e)
@@ -621,7 +1056,7 @@ namespace TileDetection
                 this.numericUpDown_upper_green.Value = this.numericUpDown_lower_green.Value;
             }
             //DetectTile();
-            DetectFiducialPointsPerspectiveMat();
+            runDetectTile();
         }
 
         private void numericUpDown_upper_green_ValueChanged(object sender, EventArgs e)
@@ -632,7 +1067,7 @@ namespace TileDetection
             }
 
             //DetectTile();
-            DetectFiducialPointsPerspectiveMat();
+            runDetectTile();
         }
 
         private void numericUpDown_lower_red_ValueChanged(object sender, EventArgs e)
@@ -642,7 +1077,7 @@ namespace TileDetection
                 this.numericUpDown_upper_red.Value = this.numericUpDown_lower_red.Value;
             }
             //DetectTile();
-            DetectFiducialPointsPerspectiveMat();
+            runDetectTile();
         }
 
         private void numericUpDown_upper_red_ValueChanged(object sender, EventArgs e)
@@ -653,7 +1088,7 @@ namespace TileDetection
             }
 
             //DetectTile();
-            DetectFiducialPointsPerspectiveMat();
+            runDetectTile();
         }
 
         private void numericUpDown_contourAreaMin_ValueChanged(object sender, EventArgs e)
@@ -672,7 +1107,11 @@ namespace TileDetection
                 this.numericUpDown_contourAreaMax.Value = this.numericUpDown_contourAreaMin.Value;
             }
         }
-   
+
+        private void tidi_button_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
 
